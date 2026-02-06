@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Rechtsmonitor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Allura&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #F5F5F7;
+            --card: #FFF;
+            --primary: #6B5C8E;
+            --primary-light: #B8AECF;
+            --secondary: #8BBEC6;
+            --text: #4A4A4A;
+            --text-med: #8E8E93;
+            --text-light: #C7C7CC;
+            --border: #E5E5EA;
+            --green: #4CAF50;
+            --red: #E53935;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Password Screen */
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #F5F5F7 0%, #E8E8EA 100%);
+        }
+        .auth-box {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .auth-title {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--text-med);
+            margin-bottom: 35px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            background: #FAFAFA;
+            margin-bottom: 14px;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .auth-error {
+            color: var(--red);
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+        .auth-hint {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 20px;
+        }
+        .auth-sig {
+            font-family: 'Allura', cursive;
+            font-size: 34px;
+            color: #6E677C;
+            margin-top: 35px;
+        }
+        
+        .app { max-width: 1200px; margin: 0 auto; padding: 20px 16px; display: none; }
+        .header { text-align: center; margin-bottom: 28px; background: var(--card); padding: 24px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .title { font-size: 32px; font-weight: 300; margin-bottom: 6px; }
+        .subtitle { font-size: 15px; color: var(--text-med); }
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab { padding: 11px 20px; background: var(--card); border: none; border-radius: 10px; color: var(--text-med); font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .tab.active { background: var(--primary); color: white; }
+        .search-box { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .search-bar { display: flex; gap: 10px; margin-bottom: 16px; }
+        .search-input { flex: 1; padding: 13px 18px; border: 1px solid var(--border); border-radius: 12px; font-size: 15px; font-family: inherit; background: #FAFAFA; }
+        .search-btn { padding: 13px 28px; background: var(--secondary); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter { padding: 9px 16px; background: #F5F5F7; border: none; border-radius: 18px; color: var(--text); font-size: 13px; font-weight: 500; cursor: pointer; }
+        .filter.active { background: var(--primary-light); color: white; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat { background: var(--card); border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .stat-label { font-size: 13px; color: var(--text-med); font-weight: 500; margin-bottom: 6px; }
+        .stat-value { font-size: 36px; font-weight: 300; }
+        .cards { background: var(--card); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .cards-header { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+        .card { padding: 18px; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 14px; cursor: pointer; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .badge { padding: 5px 11px; background: var(--primary-light); color: white; border-radius: 7px; font-size: 11px; font-weight: 600; }
+        .date { font-size: 13px; color: var(--text-med); font-weight: 500; }
+        .card-title { font-size: 15px; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+        .tag { padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 500; }
+        .tag-norm { background: #F5F5F7; color: var(--text); }
+        .tag-yes { background: #FFEBEE; color: var(--red); }
+        .tag-no { background: #E8F5E9; color: var(--green); }
+        .card-summary { font-size: 14px; line-height: 1.5; }
+        .detail { background: var(--card); border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .back-btn { padding: 9px 18px; background: #F5F5F7; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; }
+        .detail-title { font-size: 22px; font-weight: 600; margin-bottom: 14px; line-height: 1.3; }
+        .meta-box { background: #FAFAFA; padding: 18px; border-radius: 11px; margin: 18px 0; }
+        .meta-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--border); gap: 15px; }
+        .meta-row:last-child { border-bottom: none; }
+        .meta-label { font-size: 13px; color: var(--text-med); font-weight: 500; }
+        .meta-value { font-size: 13px; font-weight: 600; text-align: right; }
+        .section { margin: 22px 0; }
+        .section-title { font-size: 17px; font-weight: 600; margin-bottom: 11px; }
+        .text { font-size: 15px; line-height: 1.7; }
+        .links { display: flex; flex-direction: column; gap: 10px; }
+        .link { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: #FAFAFA; border-radius: 10px; text-decoration: none; color: var(--text); }
+        .link-text { flex: 1; font-size: 14px; font-weight: 500; }
+        .credit { position: fixed; bottom: 18px; left: 18px; font-family: 'Allura', cursive; font-size: 18px; color: #6E677C; opacity: 0.7; z-index: 100; }
+        .hide { display: none !important; }
+        .timeline-year { font-size: 15px; font-weight: 600; margin: 20px 0 12px 0; padding-bottom: 7px; border-bottom: 2px solid var(--border); }
+        @media (max-width: 768px) { .title { font-size: 26px; } .auth-title { font-size: 28px; } .search-bar { flex-direction: column; } .meta-row { flex-direction: column; gap: 4px; } .meta-value { text-align: left; } }
+    </style>
+</head>
+<body>
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-box">
+            <h1 class="auth-title">Rechtsmonitor</h1>
+            <p class="auth-subtitle">Geschützter Zugang</p>
+            <input type="password" class="auth-input" placeholder="Passwort" id="pwInput" onkeypress="if(event.key==='Enter')check()">
+            <button class="auth-btn" onclick="check()">Anmelden</button>
+            <div class="auth-error" id="err">Falsches Passwort</div>
+            <div class="auth-hint">Passwort erforderlich</div>
+            <div class="auth-sig">LawFokus</div>
+        </div>
+        <div class="credit">by CaseFokus</div>
+    </div>
+
+    <div class="app" id="app">
+        <div class="header">
+            <h1 class="title">Rechtsmonitor</h1>
+            <p class="subtitle">Neue Rechtsprechung & Koordination</p>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="showDash()">Dashboard</button>
+            <button class="tab" onclick="showArch()">Archiv</button>
+        </div>
+        <div id="dash">
+            <div class="search-box">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Suche nach Thema, Artikel, Personengruppe..." id="srch">
+                    <button class="search-btn" onclick="render()">Suchen</button>
+                </div>
+                <div class="filters">
+                    <button class="filter" onclick="toggleF(this,'bund')">Bund</button>
+                    <button class="filter" onclick="toggleF(this,'kanton')">Kanton</button>
+                    <button class="filter" onclick="toggleF(this,'vvg')">VVG</button>
+                    <button class="filter active" onclick="toggleF(this,'kvg')">KVG</button>
+                    <button class="filter" onclick="toggleF(this,'wohnsitz')">Wohnsitz</button>
+                    <button class="filter" onclick="toggleF(this,'anzeigepflicht')">Anzeigepflicht</button>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat"><div class="stat-label">Neu</div><div class="stat-value">15</div></div>
+                <div class="stat"><div class="stat-label">Diese Woche</div><div class="stat-value">42</div></div>
+                <div class="stat"><div class="stat-label">Offene Themen</div><div class="stat-value">8</div></div>
+            </div>
+            <div class="cards"><h2 class="cards-header">Neu & Relevant</h2><div id="list"></div></div>
+        </div>
+        <div id="arch" class="hide">
+            <div class="search-box">
+                <h2 style="font-size:20px;font-weight:600;margin-bottom:8px;">Archiv: Anzeigepflichtverletzung VVG</h2>
+                <p style="font-size:14px;color:var(--text-med);margin-bottom:16px;"><span id="cnt">0</span> Entscheide der letzten 20 Jahre</p>
+            </div>
+            <div class="cards" id="archList"></div>
+        </div>
+        <div id="det" class="detail hide">
+            <button class="back-btn" onclick="back()">← Zurück</button>
+            <div id="detCont"></div>
+        </div>
+        <div class="credit">by CaseFokus</div>
+    </div>
+
+    <script>
+    var PW='demo2024';function check(){if(document.getElementById('pwInput').value===PW){document.getElementById('authScreen').style.display='none';document.getElementById('app').style.display='block';render();}else{document.getElementById('err').style.display='block';document.getElementById('pwInput').value='';setTimeout(function(){document.getElementById('err').style.display='none';},3000);}}
+    var data=[{id:1,c:"BGer",d:"15.01.24",y:2024,t:"VVG Art. 6 - Anzeigepflichtverletzung bei Vorerkrankung",g:["VVG Art. 6","Anzeigepflicht"],th:"anzeigepflicht",ap:1,s:"Versicherer muss Kausalzusammenhang nachweisen. Blosse Vermutung genügt nicht.",f:"Der Versicherer kündigte wegen Anzeigepflichtverletzung nach VVG Art. 6. Das Bundesgericht bestätigte, dass der Kausalzusammenhang nachgewiesen werden muss.",m:{g:"Bundesgericht",a:"4A_15/2024",o:"Gutgeheissen",ap:"Ja - verletzt"},n:1},{id:2,c:"BGer",d:"08.12.23",y:2023,t:"Anzeigepflichtverletzung - Fragenkatalog unvollständig",g:["VVG Art. 6","Fragenkatalog"],th:"anzeigepflicht",ap:0,s:"Wenn Fragenkatalog unvollständig ist, kann keine Anzeigepflichtverletzung vorliegen.",f:"Das Bundesgericht stellte klar, dass der Versicherer das Risiko einer unklaren Fragestellung trägt.",m:{g:"Bundesgericht",a:"4A_542/2023",o:"Gutgeheissen",ap:"Nein - nicht verletzt"},n:1},{id:3,c:"ZH OGer",d:"22.11.23",y:2023,t:"Anzeigepflicht - Fahrlässigkeit vs. Absicht",g:["VVG Art. 6","Fahrlässigkeit"],th:"anzeigepflicht",ap:1,s:"Bei fahrlässiger Verletzung kann Versicherer Vertrag anpassen, bei Arglist ist Rücktritt möglich.",f:"Das Obergericht Zürich differenzierte zwischen fahrlässiger und arglistiger Verletzung der Anzeigepflicht.",m:{g:"Obergericht Zürich",a:"HG210089",o:"Teilweise gutgeheissen",ap:"Ja - fahrlässig"},n:0},{id:4,c:"BGer",d:"05.09.23",y:2023,t:"Bagatellschaden - keine Anzeigepflicht",g:["VVG Art. 6","Bagatellschaden"],th:"anzeigepflicht",ap:0,s:"Nicht jede Vorerkrankung muss angezeigt werden. Massgebend ist die Erheblichkeit.",f:"Das Bundesgericht stellte klar, dass geringfügige Behandlungen nicht angezeigt werden müssen.",m:{g:"Bundesgericht",a:"4A_345/2023",o:"Gutgeheissen",ap:"Nein - Bagatelle"},n:0},{id:5,c:"BGer",d:"12.06.23",y:2023,t:"Anzeigepflicht - Kausalität erforderlich",g:["VVG Art. 6","Kausalität"],th:"anzeigepflicht",ap:1,s:"Auch bei erwiesener Anzeigepflichtverletzung muss Versicherer Kausalität nachweisen.",f:"Das Bundesgericht bekräftigte, dass der Nachweis der Kausalität erforderlich ist.",m:{g:"Bundesgericht",a:"4A_234/2023",o:"Abgewiesen",ap:"Ja - aber keine Kausalität"},n:0},{id:6,c:"BGer",d:"28.03.22",y:2022,t:"Nachfragepflicht des Versicherers",g:["VVG Art. 6","Nachfragepflicht"],th:"anzeigepflicht",ap:0,s:"Bei unklaren Antworten muss Versicherer nachfragen. Unterlassene Nachfrage geht zu Lasten des Versicherers.",f:"Das Bundesgericht stellte fest, dass der Versicherer eine Nachfragepflicht trifft.",m:{g:"Bundesgericht",a:"4A_122/2022",o:"Gutgeheissen",ap:"Nein - hätte nachfragen müssen"},n:0},{id:7,c:"BGer",d:"15.11.21",y:2021,t:"Anzeigepflicht bei Gruppenversicherung",g:["VVG Art. 6","Gruppenversicherung"],th:"anzeigepflicht",ap:0,s:"Bei Gruppenversicherungen gelten erleichterte Anforderungen an Anzeigepflicht.",f:"Das Bundesgericht urteilte, dass bei Gruppenversicherungen die Anzeigepflicht eingeschränkt ist.",m:{g:"Bundesgericht",a:"4A_456/2021",o:"Gutgeheissen",ap:"Nein - Gruppenversicherung"},n:0},{id:8,c:"BGer",d:"07.07.20",y:2020,t:"Beweiswürdigung bei Anzeigepflichtverletzung",g:["VVG Art. 6","Beweis"],th:"anzeigepflicht",ap:1,s:"Versicherer muss beweisen, dass Versicherter Tatsache kannte und vorsätzlich verschwieg.",f:"Das Bundesgericht legte die Beweisanforderungen bei Anzeigepflichtverletzung dar.",m:{g:"Bundesgericht",a:"4A_289/2020",o:"Teilweise gutgeheissen",ap:"Ja - grobfahrlässig"},n:0},{id:9,c:"BGer",d:"19.02.19",y:2019,t:"Anzeigepflicht - zeitlicher Zusammenhang",g:["VVG Art. 6","Zeitlicher Zusammenhang"],th:"anzeigepflicht",ap:0,s:"Lange zurückliegende Behandlungen müssen nicht angezeigt werden. 5-10 Jahre sind Richtwert.",f:"Das Bundesgericht entschied, dass weit zurückliegende Behandlungen nicht angezeigt werden müssen.",m:{g:"Bundesgericht",a:"4A_567/2019",o:"Gutgeheissen",ap:"Nein - zu lange zurückliegend"},n:0},{id:10,c:"BGer",d:"11.09.18",y:2018,t:"Anzeigepflicht - psychische Vorerkrankungen",g:["VVG Art. 6","Psychische Erkrankung"],th:"anzeigepflicht",ap:1,s:"Auch psychische Vorerkrankungen unterliegen der Anzeigepflicht. Stigmatisierung ist kein Rechtfertigungsgrund.",f:"Das Bundesgericht stellte klar, dass auch psychische Erkrankungen der Anzeigepflicht unterliegen.",m:{g:"Bundesgericht",a:"4A_234/2018",o:"Abgewiesen",ap:"Ja - verletzt"},n:0},{id:11,c:"ZH VGr",d:"29.01.24",y:2024,t:"Wohnsitz trotz Auslandaufenthalt",g:["KVG","Wohnsitz"],th:"wohnsitz",ap:null,s:"Massgebend ist der Lebensmittelpunkt (Mittelpunkt der Lebensinteressen), nicht nur die melderechtliche Anmeldung.",f:"Das Verwaltungsgericht hatte über die Versicherungspflicht eines Grenzgängers zu entscheiden.",m:{g:"Verwaltungsgericht Zürich",a:"VB.2023.00456",o:"Gutgeheissen",ap:"n/a"},n:1}];
+    var view='dash',filters=['kvg'];
+    function render(){var l=document.getElementById('list'),h='',f=data.filter(function(d){if(!d.n)return false;var t=(d.t+' '+d.g.join(' ')+' '+d.th).toLowerCase(),m=filters.length===0;for(var i=0;i<filters.length;i++){if(t.indexOf(filters[i])>-1){m=true;break;}}return m;});for(var i=0;i<f.length&&i<6;i++){var d=f[i];h+='<div class="card" onclick="showDet('+d.id+')"><div class="card-header"><span class="badge">'+d.c+'</span><span class="date">'+d.d+'</span></div><div class="card-title">'+d.t+'</div><div class="tags">';for(var j=0;j<d.g.length;j++){h+='<span class="tag tag-norm">'+d.g[j]+'</span>';}if(d.ap!==null){h+='<span class="tag tag-'+(d.ap?'yes':'no')+'">Anzeigepflicht: '+(d.ap?'Ja':'Nein')+'</span>';}h+='</div><div class="card-summary">'+d.s+'</div></div>';}l.innerHTML=h;}
+    function renderArch(){var a=data.filter(function(d){return d.th==='anzeigepflicht';}),y={};document.getElementById('cnt').textContent=a.length;for(var i=0;i<a.length;i++){if(!y[a[i].y])y[a[i].y]=[];y[a[i].y].push(a[i]);}var s=Object.keys(y).sort(function(a,b){return b-a;}),h='';for(var i=0;i<s.length;i++){var yr=s[i];h+='<div class="timeline-year">'+yr+'</div>';for(var j=0;j<y[yr].length;j++){var d=y[yr][j];h+='<div class="card" onclick="showDet('+d.id+')"><div class="card-header"><span class="badge">'+d.c+'</span><span class="date">'+d.d+'</span></div><div class="card-title">'+d.t+'</div><div class="tags">';for(var k=0;k<d.g.length;k++){h+='<span class="tag tag-norm">'+d.g[k]+'</span>';}h+='<span class="tag tag-'+(d.ap?'yes':'no')+'">Anzeigepflicht: '+(d.ap?'Ja':'Nein')+'</span></div></div>';}}document.getElementById('archList').innerHTML=h;}
+    function showDet(id){var d=data.find(function(x){return x.id===id;});if(!d)return;var h='<div class="card-header"><span class="badge">'+d.c+'</span><span class="date">'+d.d+'</span></div><h1 class="detail-title">'+d.t+'</h1><div class="tags">';for(var i=0;i<d.g.length;i++){h+='<span class="tag tag-norm">'+d.g[i]+'</span>';}if(d.ap!==null){h+='<span class="tag tag-'+(d.ap?'yes':'no')+'">Anzeigepflicht: '+(d.ap?'verletzt':'nicht verletzt')+'</span>';}h+='</div><div class="meta-box"><div class="meta-row"><span class="meta-label">Gericht</span><span class="meta-value">'+d.m.g+'</span></div><div class="meta-row"><span class="meta-label">Aktenzeichen</span><span class="meta-value">'+d.m.a+'</span></div><div class="meta-row"><span class="meta-label">Outcome</span><span class="meta-value">'+d.m.o+'</span></div><div class="meta-row"><span class="meta-label">Anzeigepflicht</span><span class="meta-value">'+d.m.ap+'</span></div></div><div class="section"><h3 class="section-title">Zusammenfassung</h3><div class="text">'+d.s+'</div></div><div class="section"><h3 class="section-title">Volltext</h3><div class="text">'+d.f+'</div></div><div class="section"><h3 class="section-title">Weiterführende Links</h3><div class="links"><a href="#" class="link" onclick="return false;"><span class="link-text">Original-Urteil (BGer.ch)</span></a><a href="#" class="link" onclick="return false;"><span class="link-text">Basler Kommentar VVG - Art. 6</span></a><a href="#" class="link" onclick="return false;"><span class="link-text">Koordination.ch - Ähnliche Fälle</span></a><a href="#" class="link" onclick="return false;"><span class="link-text">SJZ Artikel zur Anzeigepflicht</span></a></div></div>';document.getElementById('detCont').innerHTML=h;document.getElementById('dash').className='hide';document.getElementById('arch').className='hide';document.getElementById('det').className='detail';var t=document.querySelectorAll('.tab');for(var i=0;i<t.length;i++)t[i].className='tab';}
+    function showDash(){view='dash';document.getElementById('dash').className='';document.getElementById('arch').className='hide';document.getElementById('det').className='detail hide';document.querySelectorAll('.tab')[0].className='tab active';document.querySelectorAll('.tab')[1].className='tab';}
+    function showArch(){view='arch';renderArch();document.getElementById('dash').className='hide';document.getElementById('arch').className='';document.getElementById('det').className='detail hide';document.querySelectorAll('.tab')[0].className='tab';document.querySelectorAll('.tab')[1].className='tab active';}
+    function back(){if(view==='arch'){showArch();}else{showDash();}}
+    function toggleF(b,f){if(b.className.indexOf('active')>-1){b.className='filter';var i=filters.indexOf(f);if(i>-1)filters.splice(i,1);}else{b.className='filter active';filters.push(f);}render();}
+    </script>
+</body>
+</html>
