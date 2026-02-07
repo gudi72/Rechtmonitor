@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechtsmonitor - AI Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Allura&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #F5F5F7;
+            --card: #FFF;
+            --primary: #6B5C8E;
+            --primary-light: #B8AECF;
+            --secondary: #8BBEC6;
+            --text: #4A4A4A;
+            --text-med: #8E8E93;
+            --text-light: #C7C7CC;
+            --border: #E5E5EA;
+            --orange: #F59E0B;
+            --blue: #3B82F6;
+            --gray: #9CA3AF;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Password Screen */
+        .auth-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #F5F5F7 0%, #E8E8EA 100%);
+        }
+        .auth-box {
+            background: white;
+            border-radius: 20px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .auth-title {
+            font-size: 32px;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--text-med);
+            margin-bottom: 35px;
+        }
+        .auth-input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            background: #FAFAFA;
+            margin-bottom: 14px;
+        }
+        .auth-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .auth-error {
+            color: #E53935;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+        .auth-hint {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 20px;
+        }
+        .auth-sig {
+            font-family: 'Allura', cursive;
+            font-size: 34px;
+            color: #6E677C;
+            margin-top: 35px;
+        }
+        
+        .app { max-width: 1200px; margin: 0 auto; padding: 20px 16px; display: none; }
+        .header { text-align: center; margin-bottom: 28px; background: var(--card); padding: 24px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .title { font-size: 32px; font-weight: 300; margin-bottom: 6px; }
+        .subtitle { font-size: 15px; color: var(--text-med); }
+        
+        .demo-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; }
+        .tab { padding: 11px 20px; background: var(--card); border: none; border-radius: 10px; color: var(--text-med); font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.04); white-space: nowrap; }
+        .tab.active { background: var(--primary); color: white; }
+        
+        /* AI Analysis Section */
+        .ai-section {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .ai-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .ai-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .case-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+        
+        .case-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .analyze-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .analyze-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .example-cases {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .example-label {
+            font-size: 13px;
+            color: var(--text-med);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .example-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .example-btn {
+            padding: 8px 14px;
+            background: #F5F5F7;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            color: var(--text);
+        }
+        
+        .example-btn:active {
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        /* AI Analysis Result */
+        .ai-result {
+            margin-top: 24px;
+            display: none;
+        }
+        
+        .result-card {
+            background: #FAFAFA;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .result-icon {
+            font-size: 24px;
+        }
+        
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .risk-level {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        .risk-high {
+            background: #9A5E63;
+            color: #FFFFFF;
+        }
+        
+        .risk-medium {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .risk-low {
+            background: #5F9A8A;
+            color: #FFFFFF;
+        }
+        
+        .result-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .result-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .result-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+        
+        .result-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .related-cases {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .related-case {
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .related-case:active {
+            transform: scale(0.98);
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        .case-ref {
+            font-size: 12px;
+            color: var(--text-med);
+            font-weight: 500;
+        }
+        
+        .case-title-mini {
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        
+        .similarity {
+            font-size: 11px;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+        
+        .action-items {
+            background: #EEF2FF;
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+        
+        .action-item {
+            display: flex;
+            gap: 10px;
+            padding: 8px 0;
+        }
+        
+        .action-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .credit {
+            position: fixed;
+            bottom: 18px;
+            left: 18px;
+            font-family: 'Allura', cursive;
+            font-size: 18px;
+            color: #6E677C;
+            opacity: 0.7;
+            z-index: 100;
+        }
+        
+        .hide { display: none !important; }
+        
+        @media (max-width: 768px) {
+            .title { font-size: 26px; }
+            .auth-title { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-box">
+            <h1 class="auth-title">Rechtsmonitor AI Demo</h1>
+            <p class="auth-subtitle">Geschützter Zugang</p>
+            <input type="password" class="auth-input" placeholder="Passwort" id="pwInput" onkeypress="if(event.key==='Enter')check()">
+            <button class="auth-btn" onclick="check()">Anmelden</button>
+            <div class="auth-error" id="err">Falsches Passwort</div>
+            <div class="auth-hint">Passwort: demo2024</div>
+            <div class="auth-sig">LawFokus</div>
+        </div>
+        <div class="credit">by CaseFokus</div>
+    </div>
+
+    <div class="app" id="app">
+        <div class="header">
+            <h1 class="title">Rechtsmonitor AI</h1>
+            <p class="subtitle">Intelligente Fall-Analyse</p>
+            <span class="demo-badge">DEMO PROTOTYP</span>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active">🤖 Fall analysieren</button>
+            <button class="tab">📊 Dashboard</button>
+        </div>
+
+        <div class="ai-section">
+            <div class="ai-header">
+                <div class="ai-icon">🤖</div>
+                <div>
+                    <div class="ai-title">Intelligente Fall-Analyse</div>
+                    <div style="font-size: 13px; color: var(--text-med);">KI-gestützte Rechtsprechungs-Prüfung</div>
+                </div>
+            </div>
+
+            <textarea 
+                class="case-input" 
+                id="caseInput" 
+                placeholder="Beschreiben Sie Ihren Fall hier...
+
+Beispiel:
+Kunde, 55 Jahre, Grenzgänger aus Deutschland, arbeitet 60% in der Schweiz. Wohnt seit 2 Jahren in Freiburg (DE). Möchte KVG-Versicherung beenden, da er hauptsächlich in Deutschland lebt."
+            ></textarea>
+
+            <button class="analyze-btn" onclick="analyzeCase()">
+                Fall analysieren
+            </button>
+
+            <div class="example-cases">
+                <div class="example-label">Beispiel-Fälle zum Testen:</div>
+                <div class="example-btns">
+                    <button class="example-btn" onclick="loadExample(1)">Grenzgänger KVG</button>
+                    <button class="example-btn" onclick="loadExample(2)">Anzeigepflicht Depression</button>
+                    <button class="example-btn" onclick="loadExample(3)">VVG Kündigung</button>
+                    <button class="example-btn" onclick="loadExample(4)">Student EU</button>
+                    <button class="example-btn" onclick="loadExample(5)">Gruppenversicherung</button>
+                </div>
+            </div>
+
+            <div class="ai-result" id="aiResult">
+                <!-- Results will be inserted here -->
+            </div>
+        </div>
+
+        <div class="credit">by CaseFokus</div>
+    </div>
+
+    <script>
+    var PW='demo2024';
+    function check(){
+        if(document.getElementById('pwInput').value===PW){
+            document.getElementById('authScreen').style.display='none';
+            document.getElementById('app').style.display='block';
+        }else{
+            document.getElementById('err').style.display='block';
+            document.getElementById('pwInput').value='';
+            setTimeout(function(){document.getElementById('err').style.display='none';},3000);
+        }
+    }
+
+    const examples = {
+        1: {
+            text: "Kunde, 55 Jahre, Grenzgänger aus Deutschland. Arbeitet 60% in Zürich, wohnt seit 2 Jahren in Freiburg (DE). Möchte KVG-Versicherung beenden, da er hauptsächlich in Deutschland lebt. Familie (Ehefrau, 2 Kinder) leben alle in Deutschland.",
+            analysis: {
+                risk: "high",
+                riskLabel: "Hohes Risiko",
+                summary: "Kritischer Fall mit hohem Streitpotenzial. Rechtsprechung ist nicht eindeutig - Lebensmittelpunkt entscheidend, nicht formeller Wohnsitz.",
+                keyIssues: [
+                    "Lebensmittelpunkt muss ermittelt werden (nicht nur Wohnsitz!)",
+                    "60% Arbeitspensum Schweiz spricht für KVG-Pflicht",
+                    "Familie in Deutschland spricht dagegen",
+                    "BGer-Praxis: Gesamtwürdigung aller Umstände"
+                ],
+                relevantCases: [
+                    { ref: "9C_456/2023", title: "Wohnsitz trotz Auslandaufenthalt", similarity: "92% Ähnlichkeit", outcome: "Gutgeheissen" },
+                    { ref: "9C_234/2023", title: "Grenzgänger - Lebensmittelpunkt", similarity: "87% Ähnlichkeit", outcome: "Abgewiesen" },
+                    { ref: "2C_567/2023", title: "KVG-Pflicht bei Teilzeitarbeit", similarity: "78% Ähnlichkeit", outcome: "Gutgeheissen" }
+                ],
+                recommendations: [
+                    "Detaillierte Abklärung des Lebensmittelpunkts erforderlich",
+                    "Wo verbringt Kunde Wochenenden/Ferien?",
+                    "Soziale Kontakte: Schweiz oder Deutschland?",
+                    "Vereinsmitgliedschaften, Hobbies, Aktivitäten?",
+                    "Falls unklar: Rechtsdienst konsultieren!"
+                ],
+                forInsurer: "Als Krankenversicherer: KVG-Pflicht kann weiterhin bestehen. Nicht voreilig kündigen! Bei 60% Arbeitspensum in CH ist Risiko hoch, dass BGer KVG-Pflicht bejaht.",
+                forBroker: "Als Vermittler: Kunde über Rechtslage aufklären. Dokumentieren Sie die Abklärungen schriftlich. Bei Unsicherheit: Einschätzung Rechtsdienst einholen."
+            }
+        },
+        2: {
+            text: "Kundin, 42 Jahre, meldet bei Antrag auf Zusatzversicherung eine Depression von vor 7 Jahren nicht. Damals 6 Monate in Behandlung, seither symptomfrei. Jetzt will Versicherer wegen Anzeigepflichtverletzung zurücktreten.",
+            analysis: {
+                risk: "medium",
+                riskLabel: "Mittleres Risiko",
+                summary: "Anzeigepflichtverletzung umstritten. Zeitlicher Abstand (7 Jahre) und vollständige Heilung sprechen für Kundin. Fragenkatalog des Versicherers entscheidend.",
+                keyIssues: [
+                    "7 Jahre zurückliegende, abgeschlossene Behandlung",
+                    "Aktuell symptomfrei und keine Behandlung",
+                    "BGer: Lange zurückliegende Erkrankungen müssen nicht immer angezeigt werden",
+                    "Formulierung der Frage im Antrag ist entscheidend"
+                ],
+                relevantCases: [
+                    { ref: "4A_234/2018", title: "Anzeigepflicht - psychische Vorerkrankungen", similarity: "89% Ähnlichkeit", outcome: "Abgewiesen" },
+                    { ref: "4A_567/2019", title: "Anzeigepflicht - zeitlicher Zusammenhang", similarity: "85% Ähnlichkeit", outcome: "Gutgeheissen" },
+                    { ref: "4A_345/2023", title: "Bagatellschaden - keine Anzeigepflicht", similarity: "72% Ähnlichkeit", outcome: "Gutgeheissen" }
+                ],
+                recommendations: [
+                    "Fragenkatalog im Antrag genau prüfen",
+                    "War Frage eindeutig auf diese Situation bezogen?",
+                    "7 Jahre = Grenzfall (5-10 Jahre Richtwert BGer)",
+                    "Vollständige Heilung dokumentieren",
+                    "Gute Chancen für Kundin, aber nicht sicher"
+                ],
+                forInsurer: "Als Versicherer: Prüfen Sie Ihren Fragenkatalog. War die Frage eindeutig? Ältere Vorerkrankungen müssen präzise erfragt werden. Rücktritt könnte scheitern.",
+                forBroker: "Als Vermittler: Kundin hat gute Argumente. 7 Jahre + vollständige Heilung sprechen für sie. Empfehlung: Rechtliche Prüfung durch Fachperson."
+            }
+        },
+        3: {
+            text: "Kunde kündigt VVG-Zusatzversicherung fristgerecht per 31.12. Versicherer bestätigt Kündigung per E-Mail. Jetzt erhält Kunde trotzdem Prämienrechnung für Folgejahr.",
+            analysis: {
+                risk: "low",
+                riskLabel: "Niedriges Risiko",
+                summary: "Klarer Fall zugunsten des Kunden. Kündigungsbestätigung liegt vor. Versicherer hat rechtlich keine Handhabe.",
+                keyIssues: [
+                    "Fristgerechte Kündigung durch Kunde",
+                    "Bestätigung durch Versicherer per E-Mail",
+                    "E-Mail gilt als gültige Kündigungsbestätigung",
+                    "Prämienrechnung ist ungerechtfertigt"
+                ],
+                relevantCases: [
+                    { ref: "9C_234/2023", title: "Kündigung und Fristen bei Prämienerhöhung", similarity: "68% Ähnlichkeit", outcome: "Abgewiesen" },
+                    { ref: "4A_122/2022", title: "Nachfragepflicht des Versicherers", similarity: "45% Ähnlichkeit", outcome: "Gutgeheissen" }
+                ],
+                recommendations: [
+                    "Kunde muss Prämie NICHT bezahlen",
+                    "Kündigungsbestätigung (E-Mail) als Beweis vorlegen",
+                    "Bei weiteren Mahnungen: Schriftliche Beschwerde",
+                    "Ombudsstelle einschalten falls nötig"
+                ],
+                forInsurer: "Als Versicherer: Administrativer Fehler. Korrigieren Sie umgehend. Kündigungsbestätigung ist bindend. Keine Prämie einforderbar.",
+                forBroker: "Als Vermittler: Kunde hat klaren Anspruch. Setzen Sie sich mit Versicherer in Verbindung. E-Mail-Bestätigung reicht als Beweis."
+            }
+        },
+        4: {
+            text: "Student aus Deutschland, 22 Jahre, studiert seit 4 Monaten an der ETH Zürich. Krankenversichert in Deutschland. Frage: Muss er sich in der Schweiz (KVG) versichern?",
+            analysis: {
+                risk: "medium",
+                riskLabel: "Mittleres Risiko",
+                summary: "Typischer Grenzfall bei EU-Studierenden. Entscheidend ist Dauer und Intensität des Aufenthalts sowie Lebensmittelpunkt.",
+                keyIssues: [
+                    "Studium >3 Monate → KVG-Pflicht prüfen",
+                    "Lebensmittelpunkt: Schweiz oder Deutschland?",
+                    "FZA (Freizügigkeitsabkommen) geht vor",
+                    "Krankenversicherung in DE kann unter Umständen reichen"
+                ],
+                relevantCases: [
+                    { ref: "2C_567/2023", title: "EU-Studenten und KVG-Versicherungspflicht", similarity: "94% Ähnlichkeit", outcome: "Gutgeheissen" },
+                    { ref: "9C_456/2023", title: "Wohnsitz trotz Auslandaufenthalt", similarity: "71% Ähnlichkeit", outcome: "Gutgeheissen" }
+                ],
+                recommendations: [
+                    "Prüfen: Ist Lebensmittelpunkt in CH verlegt?",
+                    "Wo ist Student an Wochenenden/Ferien?",
+                    "Ordentliche Einschreibung ETH (Vollzeit)?",
+                    "EU-Koordination beachten (FZA Art. 4)",
+                    "Bei Vollzeit-Studium >3 Monate: Meist KVG-Pflicht"
+                ],
+                forInsurer: "Als Krankenversicherer: Klären Sie Lebensmittelpunkt ab. Bei Vollzeitstudium und Wohnsitz CH: KVG-Pflicht wahrscheinlich. FZA-Koordination beachten.",
+                forBroker: "Als Vermittler: Student aufklären über KVG-Pflicht. Abklärung mit Kantonsarzt empfehlen. Deutsche Versicherung könnte unter Umständen ausreichen (FZA)."
+            }
+        },
+        5: {
+            text: "Arbeitnehmer, neu im Betrieb, automatisch in Gruppenversicherung aufgenommen. Versicherer verlangt nachträglich Gesundheitsprüfung wegen Vorerkrankung (Diabetes Typ 2).",
+            analysis: {
+                risk: "low",
+                riskLabel: "Niedriges Risiko",
+                summary: "Klarer Fall zugunsten des Arbeitnehmers. Bei Gruppenversicherungen gilt erleichterte bzw. keine individuelle Gesundheitsprüfung.",
+                keyIssues: [
+                    "Gruppenversicherung = erleichterte Aufnahmebedingungen",
+                    "Keine nachträgliche individuelle Risikoprüfung möglich",
+                    "Arbeitnehmer wurde automatisch aufgenommen",
+                    "BGer: Versicherer trägt Risiko bei Gruppenverträgen"
+                ],
+                relevantCases: [
+                    { ref: "4A_456/2021", title: "Anzeigepflicht bei Gruppenversicherung", similarity: "91% Ähnlichkeit", outcome: "Gutgeheissen" },
+                    { ref: "4A_542/2023", title: "Anzeigepflichtverletzung - Fragenkatalog unvollständig", similarity: "67% Ähnlichkeit", outcome: "Gutgeheissen" }
+                ],
+                recommendations: [
+                    "Arbeitnehmer muss KEINE Gesundheitsprüfung nachreichen",
+                    "Versicherer kann nicht nachträglich Prüfung verlangen",
+                    "Bei automatischer Aufnahme: Keine Anzeigepflicht",
+                    "Versicherer trägt Risiko bei Gruppenverträgen"
+                ],
+                forInsurer: "Als Versicherer: Sie tragen das Risiko bei automatischer Aufnahme in Gruppenversicherung. Keine nachträgliche individuelle Prüfung möglich. BGer-Praxis eindeutig.",
+                forBroker: "Als Vermittler: Arbeitnehmer ist geschützt. Keine Gesundheitsprüfung nötig bei automatischer Aufnahme. Versicherer kann Vertrag nicht anfechten."
+            }
+        }
+    };
+
+    function loadExample(num) {
+        const ex = examples[num];
+        if (ex) {
+            document.getElementById('caseInput').value = ex.text;
+        }
+    }
+
+    function analyzeCase() {
+        const input = document.getElementById('caseInput').value.trim();
+        if (!input) {
+            alert('Bitte beschreiben Sie zuerst einen Fall.');
+            return;
+        }
+
+        // Find matching example or use default
+        let analysis = null;
+        for (let key in examples) {
+            if (examples[key].text === input) {
+                analysis = examples[key].analysis;
+                break;
+            }
+        }
+
+        if (!analysis) {
+            // Default generic analysis
+            analysis = {
+                risk: "medium",
+                riskLabel: "Analyse läuft...",
+                summary: "Dies ist ein Demo-Prototyp. Bitte verwenden Sie einen der Beispiel-Fälle oben, um die AI-Analyse zu sehen.",
+                keyIssues: [
+                    "Wählen Sie einen Beispiel-Fall aus",
+                    "Die AI-Analyse zeigt dann relevante Urteile",
+                    "Sowie konkrete Handlungsempfehlungen"
+                ],
+                relevantCases: [],
+                recommendations: [
+                    "In der finalen Version analysiert die AI jeden Fall individuell",
+                    "Findet automatisch relevante Rechtsprechung",
+                    "Gibt massgeschneiderte Empfehlungen"
+                ],
+                forInsurer: "Demo: Hier erscheint die Einschätzung für Versicherer",
+                forBroker: "Demo: Hier erscheint die Einschätzung für Vermittler/Berater"
+            };
+        }
+
+        showAnalysis(analysis);
+    }
+
+    function showAnalysis(data) {
+        const resultDiv = document.getElementById('aiResult');
+        
+        let html = `
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">⚠️</span>
+                    <span class="result-title">Risikoeinschätzung</span>
+                    <span class="risk-level risk-${data.risk}">${data.riskLabel}</span>
+                </div>
+                <div class="result-content">
+                    <p>${data.summary}</p>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">🔍</span>
+                    <span class="result-title">Kritische Punkte</span>
+                </div>
+                <div class="result-content">
+                    <ul class="result-list">
+                        ${data.keyIssues.map(issue => `<li>${issue}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+
+            ${data.relevantCases.length > 0 ? `
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">⚖️</span>
+                    <span class="result-title">Ähnliche Fälle</span>
+                </div>
+                <div class="result-content">
+                    <div class="related-cases">
+                        ${data.relevantCases.map(c => `
+                            <div class="related-case">
+                                <div class="case-ref">${c.ref} • ${c.outcome}</div>
+                                <div class="case-title-mini">${c.title}</div>
+                                <div class="similarity">${c.similarity}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">💼</span>
+                    <span class="result-title">Praxisrelevanz</span>
+                </div>
+                <div class="result-content">
+                    <p><strong>Für Krankenversicherer:</strong><br>${data.forInsurer}</p>
+                    <br>
+                    <p><strong>Für Vermittler/Berater:</strong><br>${data.forBroker}</p>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">✅</span>
+                    <span class="result-title">Handlungsempfehlungen</span>
+                </div>
+                <div class="result-content">
+                    <div class="action-items">
+                        ${data.recommendations.map(rec => `
+                            <div class="action-item">
+                                <div class="action-checkbox"></div>
+                                <div>${rec}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        resultDiv.innerHTML = html;
+        resultDiv.style.display = 'block';
+        
+        // Scroll to results
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    </script>
+</body>
+</html>
